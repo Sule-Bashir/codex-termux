@@ -439,7 +439,9 @@ impl OauthLoginFlow {
         } = headers;
         let default_headers = build_default_headers(http_headers, env_http_headers)?;
         let http_client = apply_default_headers(ClientBuilder::new(), &default_headers).build()?;
-
+            Client::builder(),
+            &default_headers,
+        ))?;
         let mut oauth_state = OAuthState::new(server_url, Some(http_client)).await?;
         let scope_refs: Vec<&str> = scopes.iter().map(String::as_str).collect();
         oauth_state
