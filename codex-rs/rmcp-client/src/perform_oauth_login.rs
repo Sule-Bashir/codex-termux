@@ -557,24 +557,29 @@ impl OauthLoginFlow {
         rx
     }
 }
-
 fn append_query_param(url: &str, key: &str, value: Option<&str>) -> String {
     let Some(value) = value else {
         return url.to_string();
     };
+
     let value = value.trim();
     if value.is_empty() {
         return url.to_string();
     }
+
     if let Ok(mut parsed) = Url::parse(url) {
+        if parsed.query_pairs().any(|(existing_key, _)| existing_key == key) {
+            return parsed.to_string();
+        }
+
         parsed.query_pairs_mut().append_pair(key, value);
         return parsed.to_string();
     }
+
     let encoded = urlencoding::encode(value);
     let separator = if url.contains('?') { "&" } else { "?" };
     format!("{url}{separator}{key}={encoded}")
 }
-
 #[cfg(test)]
 mod tests {
     use pretty_assertions::assert_eq;
