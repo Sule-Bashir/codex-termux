@@ -442,12 +442,12 @@ impl OauthLoginFlow {
         let oauth_resource = oauth_resource.map(str::trim).filter(|resource| !resource.is_empty());
 
         if let Some(resource) = oauth_resource {
-        if resource != server_url {
-        bail!(
-            "MCP OAuth resource `{resource}` must match the server URL `{server_url}`"
-        );
-    }
-}
+            if resource != server_url {
+                bail!(
+                    "MCP OAuth resource `{resource}` must match the server URL `{server_url}`"
+                );
+            }
+        }
         let oauth_client = build_reqwest_client_with_custom_ca(apply_default_headers(
             Client::builder(),
             &default_headers,
