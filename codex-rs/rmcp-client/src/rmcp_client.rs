@@ -1,3 +1,5 @@
+use reqwest::header::HeaderName;
+use reqwest::header::HeaderValue;
 use std::borrow::Cow;
 use std::collections::HashMap;
 use std::ffi::OsString;
@@ -231,6 +233,7 @@ request = request.headers(custom_headers);
         uri: Arc<str>,
         session: Arc<str>,
         auth_token: Option<String>,
+        custom_headers: HashMap<HeaderName, HeaderValue>,
     ) -> std::result::Result<(), StreamableHttpError<Self::Error>> {
         let mut request_builder = self.inner.delete(uri.as_ref());
         if let Some(auth_header) = auth_token {
