@@ -96,14 +96,6 @@ jobs:
           echo "ANDROID_NDK_ROOT=${ndk_root}" >> "$GITHUB_ENV"
           echo "${ndk_root}/toolchains/llvm/prebuilt/linux-x86_64/bin" >> "$GITHUB_PATH"
 
-      - name: Fetch fork-owned Android rusty_v8 artifacts
-        shell: bash
-        run: |
-          set -euo pipefail
-          eval "$(python3 scripts/fetch_rusty_v8_android.py | grep '^export ' | sed 's/^export //')"
-          echo "RUSTY_V8_ARCHIVE=${RUSTY_V8_ARCHIVE}" >> "$GITHUB_ENV"
-          echo "RUSTY_V8_SRC_BINDING_PATH=${RUSTY_V8_SRC_BINDING_PATH}" >> "$GITHUB_ENV"
-
       - name: Cargo build (aarch64-linux-android)
         working-directory: codex-rs
         shell: bash
