@@ -122,12 +122,13 @@ impl StreamableHttpClient for StreamableHttpResponseClient {
     type Error = StreamableHttpResponseClientError;
 
     async fn post_message(
-        &self,
-        uri: Arc<str>,
-        message: rmcp::model::ClientJsonRpcMessage,
-        session_id: Option<Arc<str>>,
-        auth_token: Option<String>,
-    ) -> std::result::Result<StreamableHttpPostResponse, StreamableHttpError<Self::Error>> {
+    &self,
+    uri: Arc<str>,
+    message: rmcp::model::ClientJsonRpcMessage,
+    session_id: Option<Arc<str>>,
+    auth_token: Option<String>,
+    custom_headers: HashMap<HeaderName, HeaderValue>,
+) -> std::result::Result<StreamableHttpPostResponse, StreamableHttpError<Self::Error>> {
         let mut request = self
             .inner
             .post(uri.as_ref())
