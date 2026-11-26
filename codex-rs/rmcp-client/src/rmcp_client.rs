@@ -133,6 +133,8 @@ impl StreamableHttpClient for StreamableHttpResponseClient {
             .inner
             .post(uri.as_ref())
             .header(ACCEPT, [EVENT_STREAM_MIME_TYPE, JSON_MIME_TYPE].join(", "));
+        let custom_headers: HeaderMap = custom_headers.into_iter().collect();
+request = request.headers(custom_headers);
         if let Some(auth_header) = auth_token {
             request = request.bearer_auth(auth_header);
         }
