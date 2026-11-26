@@ -439,11 +439,12 @@ impl OauthLoginFlow {
             env_http_headers,
         } = headers;
         let default_headers = build_default_headers(http_headers, env_http_headers)?;
-        let http_client = apply_default_headers(ClientBuilder::new(), &default_headers).build()?;
+        let oauth_client = build_reqwest_client_with_custom_ca(apply_default_headers(
             Client::builder(),
             &default_headers,
         ))?;
-        let mut oauth_state = OAuthState::new(server_url, Some(http_client)).await?;
+
+        let mut oauth_state = OAuthState::new(server_url, Some(oauth_client)).await?;
         let scope_refs: Vec<&str> = scopes.iter().map(String::as_str).collect();
         oauth_state
             .start_authorization(&scope_refs, &redirect_uri, Some("Codex"))
