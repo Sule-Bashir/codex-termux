@@ -295,6 +295,11 @@ fn build_reqwest_client_with_env(
             };
             builder = builder.add_root_certificate(certificate);
         }
+        #[cfg(target_os = "android")]
+        {
+            builder = builder_with_android_native_roots(builder);
+        }
+
         return match builder.build() {
             Ok(client) => Ok(client),
             Err(source) => {
@@ -319,6 +324,11 @@ fn build_reqwest_client_with_env(
         "using system root certificates because no CA override environment variable was selected"
     );
 
+    #[cfg(target_os = "android")]
+    {
+        builder = builder_with_android_native_roots(builder);
+    }
+
     match builder.build() {
         Ok(client) => Ok(client),
         Err(source) => {
@@ -331,6 +341,36 @@ fn build_reqwest_client_with_env(
             ))
         }
     }
+}
+
+#[cfg(target_os = "android")]
+fn builder_with_android_native_roots(builder: reqwest::ClientBuilder) -> reqwest::ClientBuilder {
+    let rustls_native_certs::CertificateResult { certs, errors, .. } =
+        rustls_native_certs::load_native_certs();
+
+    if !errors.is_empty() {
+        warn!(
+            native_root_error_count = errors.len(),
+            "encountered errors while loading native root certificates for reqwest"
+        );
+    }
+
+    let certificates =
+        certs.into_iter().enumerate().filter_map(
+            |(idx, cert)| match reqwest::Certificate::from_der(cert.as_ref()) {
+                Ok(certificate) => Some(certificate),
+                Err(source) => {
+                    warn!(
+                        certificate_index = idx + 1,
+                        error = %source,
+                        "failed to convert native root certificate for reqwest"
+                    );
+                    None
+                }
+            },
+        );
+
+    builder.tls_certs_only(certificates)
 }
 
 /// Abstracts environment access so tests can cover precedence rules without mutating process-wide
